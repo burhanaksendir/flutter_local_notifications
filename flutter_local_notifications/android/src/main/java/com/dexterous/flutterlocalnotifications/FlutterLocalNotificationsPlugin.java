@@ -501,14 +501,15 @@ public class FlutterLocalNotificationsPlugin
         long currentTimeMillis = System.currentTimeMillis();
 
         for (NotificationDetails notification : allNotifications) {
-            // If the notification's time has not passed, add it to the list.
-            if (notification.millisecondsSinceEpoch > currentTimeMillis) {
-                scheduledNotifications.add(notification);
-            } else {
-                // If the notification's time has passed, log for debugging purposes.
-                Log.d("DebugNotification", "Notification expired: " + notification.toString());
-            }
+          // If the notification's time has not passed and millisecondsSinceEpoch is not null, add it to the list.
+           if (notification.millisecondsSinceEpoch != null && notification.millisecondsSinceEpoch > currentTimeMillis) {
+              scheduledNotifications.add(notification);
+          } else {
+              // If the notification's time has passed or millisecondsSinceEpoch is null, log for debugging purposes.
+              Log.d("DebugNotification", "Notification expired or millisecondsSinceEpoch is null: " + notification.toString());
+          }
         }
+
     }
 
     // Log all notifications for debugging purposes.
