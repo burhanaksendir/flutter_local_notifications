@@ -490,15 +490,34 @@ public class FlutterLocalNotificationsPlugin
   private static ArrayList<NotificationDetails> loadScheduledNotifications(Context context) {
     ArrayList<NotificationDetails> scheduledNotifications = new ArrayList<>();
     SharedPreferences sharedPreferences =
-        context.getSharedPreferences(SCHEDULED_NOTIFICATIONS, Context.MODE_PRIVATE);
+            context.getSharedPreferences(SCHEDULED_NOTIFICATIONS, Context.MODE_PRIVATE);
     String json = sharedPreferences.getString(SCHEDULED_NOTIFICATIONS, null);
+
     if (json != null) {
-      Gson gson = buildGson();
-      Type type = new TypeToken<ArrayList<NotificationDetails>>() {}.getType();
-      scheduledNotifications = gson.fromJson(json, type);
+        Gson gson = buildGson();
+        Type type = new TypeToken<ArrayList<NotificationDetails>>() {}.getType();
+        ArrayList<NotificationDetails> allNotifications = gson.fromJson(json, type);
+
+        long currentTimeMillis = System.currentTimeMillis();
+
+        for (NotificationDetails notification : allNotifications) {
+            if (notification.getNotificationTimeMillis() > currentTimeMillis) {
+                // Bildirimin zamanı geçmemişse, listeye ekle.
+                scheduledNotifications.add(notification);
+            } else {
+                // Bildirimin zamanı geçmişse, debug amaçlı log bastır.
+                Log.d("DebugNotification", "Notification expired: " + notification.toString());
+            }
+        }
     }
+
+    // Debug amaçlı tüm bildirimleri logla.
+    for (NotificationDetails notification : scheduledNotifications) {
+        Log.d("DebugNotification", "Active Notification: " + notification.toString());
+    }
+
     return scheduledNotifications;
-  }
+}
 
   private static void saveScheduledNotifications(
       Context context, ArrayList<NotificationDetails> scheduledNotifications) {
