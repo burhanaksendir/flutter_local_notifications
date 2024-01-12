@@ -487,7 +487,7 @@ public class FlutterLocalNotificationsPlugin
     return gson;
   }
 
-  private static ArrayList<NotificationDetails> loadScheduledNotifications(Context context) {
+ private static ArrayList<NotificationDetails> loadScheduledNotifications(Context context) {
     ArrayList<NotificationDetails> scheduledNotifications = new ArrayList<>();
     SharedPreferences sharedPreferences =
             context.getSharedPreferences(SCHEDULED_NOTIFICATIONS, Context.MODE_PRIVATE);
@@ -501,8 +501,8 @@ public class FlutterLocalNotificationsPlugin
         long currentTimeMillis = System.currentTimeMillis();
 
         for (NotificationDetails notification : allNotifications) {
-            if (notification.getNotificationTimeMillis() > currentTimeMillis) {
-                // Bildirimin zamanı geçmemişse, listeye ekle.
+            // Bildirimin zamanı geçmemişse, listeye ekle.
+            if (notification.millisecondsSinceEpoch > currentTimeMillis) {
                 scheduledNotifications.add(notification);
             } else {
                 // Bildirimin zamanı geçmişse, debug amaçlı log bastır.
@@ -518,6 +518,7 @@ public class FlutterLocalNotificationsPlugin
 
     return scheduledNotifications;
 }
+
 
   private static void saveScheduledNotifications(
       Context context, ArrayList<NotificationDetails> scheduledNotifications) {
