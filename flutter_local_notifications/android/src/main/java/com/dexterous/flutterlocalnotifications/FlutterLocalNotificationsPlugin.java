@@ -487,7 +487,7 @@ public class FlutterLocalNotificationsPlugin
     return gson;
   }
 
- private static ArrayList<NotificationDetails> loadScheduledNotifications(Context context) {
+private static ArrayList<NotificationDetails> loadScheduledNotifications(Context context) {
     ArrayList<NotificationDetails> scheduledNotifications = new ArrayList<>();
     SharedPreferences sharedPreferences =
             context.getSharedPreferences(SCHEDULED_NOTIFICATIONS, Context.MODE_PRIVATE);
@@ -501,13 +501,20 @@ public class FlutterLocalNotificationsPlugin
         long currentTimeMillis = System.currentTimeMillis();
 
         for (NotificationDetails notification : allNotifications) {
-          // If the notification's time has not passed and millisecondsSinceEpoch is not null, add it to the list.
-           if (notification.millisecondsSinceEpoch != null && notification.millisecondsSinceEpoch > currentTimeMillis) {
-              scheduledNotifications.add(notification);
-          } else {
-              // If the notification's time has passed or millisecondsSinceEpoch is null, log for debugging purposes.
-              Log.d("DebugNotification", "Notification expired or millisecondsSinceEpoch is null: " + notification.toString());
-          }
+            if (notification.millisecondsSinceEpoch != null) {
+                // Log the details of the notification for debugging purposes.
+                Log.d("DebugNotification", "Notification Details: " + notification.toString());
+
+                if (notification.millisecondsSinceEpoch > currentTimeMillis) {
+                    scheduledNotifications.add(notification);
+                } else {
+                    // Log that the notification's time has passed.
+                    Log.d("DebugNotification", "Notification time has passed: " + notification.toString());
+                }
+            } else {
+                // Log that millisecondsSinceEpoch is null.
+                Log.d("DebugNotification", "millisecondsSinceEpoch is null: " + notification.toString());
+            }
         }
 
     }
@@ -519,6 +526,7 @@ public class FlutterLocalNotificationsPlugin
 
     return scheduledNotifications;
 }
+
 
 
   private static void saveScheduledNotifications(
